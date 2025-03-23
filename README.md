@@ -9,9 +9,4 @@ Grup Adı: yummy
 
 Proje Ekibi: Nilsu
 
-Gereksinim Analizi
-Durum Diyagramı
-Durum Senaryoları
-Front-End
-Back-End
-Video Sunum
+
