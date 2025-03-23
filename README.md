@@ -9,4 +9,4 @@ Grup Adı: yummy
 
 Proje Ekibi: Nilsu
 
-
+1)gereksinim-analizi
