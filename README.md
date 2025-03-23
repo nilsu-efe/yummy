@@ -10,3 +10,4 @@ Grup Adı: yummy
 Proje Ekibi: Nilsu
 
 1)[gereksinim-analizi](https://github.com/nilsu-efe/yummy/tree/main/gereksinim-analizi)
+2)[durum-diyagramı.jpeg](https://github.com/nilsu-efe/yummy/blob/main/durum-diyagram%C4%B1.jpeg)
