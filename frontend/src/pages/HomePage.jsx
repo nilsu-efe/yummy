@@ -4,14 +4,15 @@ import { useProductStore } from "../stores/useProductStore";
 import FeaturedProducts from "../components/FeaturedProducts";
 
 const categories = [
-	{ href: "/pizza", name: "pizza", imageUrl: "/pizza.jpg" },
-	{ href: "/makarna", name: "makarna", imageUrl: "/makarna.jpg" },
-	{ href: "/hamburger", name: "hamburger", imageUrl: "/hamburger.jpg" },
-	{ href: "/mantı", name: "mantı", imageUrl: "/mantı.jpg" },
-	{ href: "/pide", name: "pide", imageUrl: "/pide.jpg" },
-	{ href: "/wrap", name: "wrap", imageUrl: "/wrap.jpg" },
-	{ href: "/salata", name: "salata", imageUrl: "/salata.jpg" },
+	{ href: "/category/pizza", name: "pizza", imageUrl: "/pizza.jpg" },
+	{ href: "/category/makarna", name: "makarna", imageUrl: "/makarna.jpg" },
+	{ href: "/category/hamburger", name: "hamburger", imageUrl: "/hamburger.jpg" },
+	{ href: "/category/mantı", name: "mantı", imageUrl: "/mantı.jpg" },
+	{ href: "/category/pide", name: "pide", imageUrl: "/pide.jpg" },
+	{ href: "/category/wrap", name: "wrap", imageUrl: "/wrap.jpg" },
+	{ href: "/category/salata", name: "salata", imageUrl: "/salata.jpg" },
 ];
+
 
 const HomePage = () => {
 	const { fetchFeaturedProducts, products, isLoading } = useProductStore();
