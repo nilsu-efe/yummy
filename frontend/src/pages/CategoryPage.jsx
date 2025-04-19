@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ProductCard from "../components/ProductCard";
 
 const CategoryPage = () => {
@@ -36,15 +36,14 @@ const CategoryPage = () => {
 		(defaultProducts[category] || []).map((p) => ({ ...p, isFavorite: false }))
 	);
 
-	// Favori listesini localStorage'a kaydet
-	const saveFavorites = (favorites) => {
-		localStorage.setItem("favorites", JSON.stringify(favorites));
-	};
-
 	const handleDelete = (id) => {
 		const updated = products.filter((p) => p._id !== id);
 		setProducts(updated);
-		saveFavorites(updated.filter((p) => p.isFavorite));
+
+		// Eğer silinen ürün favoriyse, localStorage'dan da kaldır
+		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+		const newFavorites = stored.filter((item) => item._id !== id);
+		localStorage.setItem("favorites", JSON.stringify(newFavorites));
 	};
 
 	const handleAdd = () => {
@@ -55,9 +54,7 @@ const CategoryPage = () => {
 			image: `/${category}.jpg`,
 			isFavorite: false,
 		};
-		const updated = [...products, newProduct];
-		setProducts(updated);
-		saveFavorites(updated.filter((p) => p.isFavorite));
+		setProducts((prev) => [...prev, newProduct]);
 	};
 
 	const toggleFavorite = (id) => {
@@ -66,8 +63,20 @@ const CategoryPage = () => {
 		);
 		setProducts(updated);
 
-		const newFavorites = updated.filter((p) => p.isFavorite);
-		saveFavorites(newFavorites);
+		const toggledProduct = updated.find((p) => p._id === id);
+		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+		let newFavorites;
+		if (toggledProduct.isFavorite) {
+			// Önceden favoride değilse → ekle
+			const alreadyExists = stored.some((item) => item._id === toggledProduct._id);
+			newFavorites = alreadyExists ? stored : [...stored, toggledProduct];
+		} else {
+			// Favoriydi → çıkar
+			newFavorites = stored.filter((item) => item._id !== toggledProduct._id);
+		}
+
+		localStorage.setItem("favorites", JSON.stringify(newFavorites));
 	};
 
 	return (
@@ -91,12 +100,16 @@ const CategoryPage = () => {
 						{products.map((product) => (
 							<div key={product._id} className="relative">
 								<ProductCard product={product} />
+
+								{/* Sil Butonu */}
 								<button
 									onClick={() => handleDelete(product._id)}
 									className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
 								>
 									Sil
 								</button>
+
+								{/* Favori Butonu */}
 								<button
 									onClick={() => toggleFavorite(product._id)}
 									className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm rounded"
