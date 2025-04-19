@@ -10,4 +10,5 @@ Grup Adı: yummy
 Proje Ekibi: Nilsu
 
 1)[gereksinim-analizi](https://github.com/nilsu-efe/yummy/tree/main/gereksinim-analizi)
-2)domain linki:https://yummy-eta-taupe.vercel.app/
+2)[durum-diyagramı](https://github.com/nilsu-efe/yummy/blob/main/durum-diyagram%C4%B1.jpeg)
+3)domain linki:https://yummy-eta-taupe.vercel.app/
