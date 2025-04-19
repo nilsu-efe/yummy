@@ -9,7 +9,7 @@ const CategoryPage = () => {
 		pizza: [
 			{
 				_id: "demo-pizza",
-				name: "Lezzetli Pizza",
+				name: "Pizza",
 				price: 59.99,
 				image: "/pizza.jpg",
 			},
@@ -32,23 +32,31 @@ const CategoryPage = () => {
 		],
 	};
 
-	// sayfa ilk açıldığında mevcut ürünü getir
-	const [products, setProducts] = useState(defaultProducts[category] || []);
+	const [products, setProducts] = useState(
+		(defaultProducts[category] || []).map((p) => ({ ...p, isFavorite: false }))
+	);
 
-	// ürün sil
 	const handleDelete = (id) => {
 		setProducts((prev) => prev.filter((p) => p._id !== id));
 	};
 
-	// ürün ekle
 	const handleAdd = () => {
 		const newProduct = {
 			_id: Date.now().toString(),
 			name: `Yeni ${category}`,
 			price: Math.floor(Math.random() * 100),
-			image: `/${category}.jpg`, // örnek olarak aynı resmi kullan
+			image: `/${category}.jpg`,
+			isFavorite: false,
 		};
 		setProducts((prev) => [...prev, newProduct]);
+	};
+
+	const toggleFavorite = (id) => {
+		setProducts((prev) =>
+			prev.map((p) =>
+				p._id === id ? { ...p, isFavorite: !p.isFavorite } : p
+			)
+		);
 	};
 
 	return (
@@ -72,11 +80,21 @@ const CategoryPage = () => {
 						{products.map((product) => (
 							<div key={product._id} className="relative">
 								<ProductCard product={product} />
+
+								{/* Sil Butonu */}
 								<button
 									onClick={() => handleDelete(product._id)}
 									className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
 								>
 									Sil
+								</button>
+
+								{/* Favori Butonu */}
+								<button
+									onClick={() => toggleFavorite(product._id)}
+									className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm rounded"
+								>
+									{product.isFavorite ? "❤️ Favori" : "🤍 Favorilere Ekle"}
 								</button>
 							</div>
 						))}
