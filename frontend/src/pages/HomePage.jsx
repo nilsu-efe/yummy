@@ -20,12 +20,21 @@ const HomePage = () => {
 
 	useEffect(() => {
 		fetchFeaturedProducts();
+		loadFavorites();
+	}, [fetchFeaturedProducts]);
 
+	const loadFavorites = () => {
 		const stored = localStorage.getItem("favorites");
 		if (stored) {
 			setFavorites(JSON.parse(stored));
 		}
-	}, [fetchFeaturedProducts]);
+	};
+
+	const removeFromFavorites = (id) => {
+		const updated = favorites.filter((p) => p._id !== id);
+		localStorage.setItem("favorites", JSON.stringify(updated));
+		setFavorites(updated);
+	};
 
 	return (
 		<div className='relative min-h-screen text-white overflow-hidden'>
@@ -47,7 +56,15 @@ const HomePage = () => {
 						<h2 className="text-3xl font-semibold text-emerald-300 mb-6">❤️ Favorilerim</h2>
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 							{favorites.map((product) => (
-								<ProductCard key={product._id} product={product} />
+								<div key={product._id} className="relative">
+									<ProductCard product={product} />
+									<button
+										onClick={() => removeFromFavorites(product._id)}
+										className="absolute bottom-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
+									>
+										Favoriden Kaldır
+									</button>
+								</div>
 							))}
 						</div>
 					</div>
