@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
 const CategoryPage = () => {
@@ -36,11 +36,20 @@ const CategoryPage = () => {
 		(defaultProducts[category] || []).map((p) => ({ ...p, isFavorite: false }))
 	);
 
+	// ✅ FAVORİLERİ YENİDEN YÜKLEMEK İÇİN
+	useEffect(() => {
+		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+		const updatedProducts = products.map((p) => ({
+			...p,
+			isFavorite: stored.some((fav) => fav._id === p._id),
+		}));
+		setProducts(updatedProducts);
+	}, []);
+
 	const handleDelete = (id) => {
 		const updated = products.filter((p) => p._id !== id);
 		setProducts(updated);
 
-		// Eğer silinen ürün favoriyse, localStorage'dan da kaldır
 		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
 		const newFavorites = stored.filter((item) => item._id !== id);
 		localStorage.setItem("favorites", JSON.stringify(newFavorites));
@@ -68,11 +77,9 @@ const CategoryPage = () => {
 
 		let newFavorites;
 		if (toggledProduct.isFavorite) {
-			// Önceden favoride değilse → ekle
 			const alreadyExists = stored.some((item) => item._id === toggledProduct._id);
 			newFavorites = alreadyExists ? stored : [...stored, toggledProduct];
 		} else {
-			// Favoriydi → çıkar
 			newFavorites = stored.filter((item) => item._id !== toggledProduct._id);
 		}
 
