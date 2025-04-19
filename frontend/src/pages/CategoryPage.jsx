@@ -64,19 +64,21 @@ const CategoryPage = () => {
 		],
 	};
 
-	const [products, setProducts] = useState(
-		(defaultProducts[category] || []).map((p) => ({ ...p, isFavorite: false }))
-	);
+	const [products, setProducts] = useState([]);
+
 
 	// ✅ FAVORİLERİ YENİDEN YÜKLEMEK İÇİN
 	useEffect(() => {
+		const items = defaultProducts[category] || [];
 		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
-		const updatedProducts = products.map((p) => ({
+	
+		const updatedProducts = items.map((p) => ({
 			...p,
 			isFavorite: stored.some((fav) => fav._id === p._id),
 		}));
+	
 		setProducts(updatedProducts);
-	}, []);
+	}, [category]);	
 
 	const handleDelete = (id) => {
 		const updated = products.filter((p) => p._id !== id);
