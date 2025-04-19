@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useProductStore } from "../stores/useProductStore";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -8,31 +8,11 @@ const CategoryPage = () => {
 	const { fetchProductsByCategory, products } = useProductStore();
 	const { category } = useParams();
 
-	// Local ürün listesi (başlangıçta backend'den gelenler + eklenen sahte ürünler)
-	const [localProducts, setLocalProducts] = useState([]);
-
 	useEffect(() => {
 		fetchProductsByCategory(category);
-		setLocalProducts([
-			{
-				_id: "sample123",
-				name: "Örnek Pizza",
-				price: 59.99,
-				image: "/pizza.jpg",
-			},
-		]);
 	}, [fetchProductsByCategory, category]);
 
-	// Ürün Ekleme Fonksiyonu
-	const addFakeProduct = () => {
-		const newProduct = {
-			_id: Date.now().toString(),
-			name: `Yeni Ürün ${localProducts.length + 1}`,
-			price: 49.99,
-			image: "/salata.jpg",
-		};
-		setLocalProducts((prev) => [...prev, newProduct]);
-	};
+	console.log("products:", products);
 
 	return (
 		<div className='min-h-screen'>
@@ -47,10 +27,10 @@ const CategoryPage = () => {
 				</motion.h1>
 
 				{/* Ürün Ekle Butonu */}
-				<div className='text-center mb-8'>
+				<div className='text-center mb-10'>
 					<button
-						onClick={addFakeProduct}
-						className='bg-emerald-500 hover:bg-emerald-600 transition px-5 py-2 rounded text-white font-semibold'
+						onClick={() => alert("Ürün ekleme özelliği yakında aktif olacak.")}
+						className='bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded font-semibold transition'
 					>
 						+ Ürün Ekle
 					</button>
@@ -62,13 +42,13 @@ const CategoryPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8, delay: 0.2 }}
 				>
-					{localProducts.length === 0 && (
+					{products?.length === 0 && (
 						<h2 className='text-3xl font-semibold text-gray-300 text-center col-span-full'>
 							No products found
 						</h2>
 					)}
 
-					{localProducts.map((product) => (
+					{products?.map((product) => (
 						<ProductCard key={product._id} product={product} />
 					))}
 				</motion.div>
