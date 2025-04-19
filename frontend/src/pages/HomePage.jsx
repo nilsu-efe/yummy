@@ -7,7 +7,7 @@ const categories = [
 	{ href: "/pizza", name: "pizza", imageUrl: "/pizza.jpg" },
 	{ href: "/makarna", name: "makarna", imageUrl: "/makarna.jpg" },
 	{ href: "/hamburger", name: "hamburger", imageUrl: "/hamburger.jpg" },
-	{ href: "/mantı", name: "mantı", imageUrl: "/mantı.png" },
+	{ href: "/mantı", name: "mantı", imageUrl: "/mantı.jpg" },
 	{ href: "/pide", name: "pide", imageUrl: "/pide.jpg" },
 	{ href: "/wrap", name: "wrap", imageUrl: "/wrap.jpg" },
 	{ href: "/salata", name: "salata", imageUrl: "/salata.jpg" },
