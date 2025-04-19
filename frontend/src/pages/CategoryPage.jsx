@@ -7,87 +7,42 @@ const CategoryPage = () => {
 
 	const defaultProducts = {
 		pizza: [
-			{
-				_id: "demo-pizza",
-				name: "Pizza",
-				price: 59.99,
-				image: "/pizza.jpg",
-			},
+			{ _id: "pizza1", name: "Pizza", price: 59.99, image: "/pizza.jpg" },
 		],
 		makarna: [
-			{
-				_id: "demo-makarna",
-				name: "Kremalı Makarna",
-				price: 44.99,
-				image: "/makarna.jpg",
-			},
+			{ _id: "makarna1", name: "Kremalı Makarna", price: 44.99, image: "/makarna.jpg" },
 		],
 		hamburger: [
-			{
-				_id: "demo-burger",
-				name: "Dev Hamburger",
-				price: 49.99,
-				image: "/hamburger.jpg",
-			},
+			{ _id: "burger1", name: "Dev Hamburger", price: 49.99, image: "/hamburger.jpg" },
 		],
 		mantı: [
-			{
-				_id: "demo-manti",
-				name: "Kayseri Mantısı",
-				price: 39.99,
-				image: "/mantı.jpg",
-			},
+			{ _id: "manti1", name: "Kayseri Mantısı", price: 39.99, image: "/mantı.jpg" },
 		],
 		pide: [
-			{
-				_id: "demo-pide",
-				name: "Kıymalı Pide",
-				price: 42.99,
-				image: "/pide.jpg",
-			},
+			{ _id: "pide1", name: "Kıymalı Pide", price: 42.99, image: "/pide.jpg" },
 		],
 		salata: [
-			{
-				_id: "demo-salata",
-				name: "Mevsim Salata",
-				price: 24.99,
-				image: "/salata.jpg",
-			},
+			{ _id: "salata1", name: "Mevsim Salata", price: 24.99, image: "/salata.jpg" },
 		],
 		wrap: [
-			{
-				_id: "demo-wrap",
-				name: "Tavuklu Wrap",
-				price: 34.99,
-				image: "/wrap.jpg",
-			},
+			{ _id: "wrap1", name: "Tavuklu Wrap", price: 34.99, image: "/wrap.jpg" },
 		],
 	};
 
 	const [products, setProducts] = useState([]);
 
-
-	// ✅ FAVORİLERİ YENİDEN YÜKLEMEK İÇİN
+	// ✅ useEffect ile ürünleri ve favorileri yüklüyoruz
 	useEffect(() => {
 		const items = defaultProducts[category] || [];
 		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
-	
-		const updatedProducts = items.map((p) => ({
+
+		const updated = items.map((p) => ({
 			...p,
 			isFavorite: stored.some((fav) => fav._id === p._id),
 		}));
-	
-		setProducts(updatedProducts);
-	}, [category]);	
 
-	const handleDelete = (id) => {
-		const updated = products.filter((p) => p._id !== id);
 		setProducts(updated);
-
-		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
-		const newFavorites = stored.filter((item) => item._id !== id);
-		localStorage.setItem("favorites", JSON.stringify(newFavorites));
-	};
+	}, [category]);
 
 	const handleAdd = () => {
 		const newProduct = {
@@ -100,21 +55,30 @@ const CategoryPage = () => {
 		setProducts((prev) => [...prev, newProduct]);
 	};
 
+	const handleDelete = (id) => {
+		const updated = products.filter((p) => p._id !== id);
+		setProducts(updated);
+
+		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+		const newFavorites = stored.filter((item) => item._id !== id);
+		localStorage.setItem("favorites", JSON.stringify(newFavorites));
+	};
+
 	const toggleFavorite = (id) => {
 		const updated = products.map((p) =>
 			p._id === id ? { ...p, isFavorite: !p.isFavorite } : p
 		);
 		setProducts(updated);
 
-		const toggledProduct = updated.find((p) => p._id === id);
+		const toggled = updated.find((p) => p._id === id);
 		const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
 
 		let newFavorites;
-		if (toggledProduct.isFavorite) {
-			const alreadyExists = stored.some((item) => item._id === toggledProduct._id);
-			newFavorites = alreadyExists ? stored : [...stored, toggledProduct];
+		if (toggled.isFavorite) {
+			const alreadyExists = stored.some((item) => item._id === toggled._id);
+			newFavorites = alreadyExists ? stored : [...stored, toggled];
 		} else {
-			newFavorites = stored.filter((item) => item._id !== toggledProduct._id);
+			newFavorites = stored.filter((item) => item._id !== toggled._id);
 		}
 
 		localStorage.setItem("favorites", JSON.stringify(newFavorites));
@@ -141,16 +105,12 @@ const CategoryPage = () => {
 						{products.map((product) => (
 							<div key={product._id} className="relative">
 								<ProductCard product={product} />
-
-								{/* Sil Butonu */}
 								<button
 									onClick={() => handleDelete(product._id)}
 									className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
 								>
 									Sil
 								</button>
-
-								{/* Favori Butonu */}
 								<button
 									onClick={() => toggleFavorite(product._id)}
 									className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm rounded"
