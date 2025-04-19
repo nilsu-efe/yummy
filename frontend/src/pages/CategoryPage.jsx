@@ -9,13 +9,14 @@ const CategoryPage = () => {
 	const { category } = useParams();
 
 	useEffect(() => {
-		// API hatasını yutalım, sayfa çökmesin
 		try {
 			fetchProductsByCategory(category);
-		} catch (err) {
-			console.error("fetchProductsByCategory hata:", err);
+		} catch (error) {
+			console.error("fetchProductsByCategory failed:", error);
 		}
 	}, [fetchProductsByCategory, category]);
+
+	const safeProducts = Array.isArray(products) ? products : [];
 
 	return (
 		<div className='min-h-screen'>
@@ -26,7 +27,7 @@ const CategoryPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8 }}
 				>
-					{category.charAt(0).toUpperCase() + category.slice(1)}
+					{category?.charAt(0).toUpperCase() + category?.slice(1)}
 				</motion.h1>
 
 				<motion.div
@@ -35,16 +36,15 @@ const CategoryPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8, delay: 0.2 }}
 				>
-					{Array.isArray(products) && products.length === 0 && (
+					{safeProducts.length === 0 ? (
 						<h2 className='text-3xl font-semibold text-gray-300 text-center col-span-full'>
 							No products found
 						</h2>
-					)}
-
-					{Array.isArray(products) &&
-						products.map((product) => (
+					) : (
+						safeProducts.map((product) => (
 							<ProductCard key={product._id} product={product} />
-						))}
+						))
+					)}
 				</motion.div>
 			</div>
 		</div>
