@@ -30,6 +30,38 @@ const CategoryPage = () => {
 				image: "/hamburger.jpg",
 			},
 		],
+		mantı: [
+			{
+				_id: "demo-manti",
+				name: "Kayseri Mantısı",
+				price: 39.99,
+				image: "/mantı.jpg",
+			},
+		],
+		pide: [
+			{
+				_id: "demo-pide",
+				name: "Kıymalı Pide",
+				price: 42.99,
+				image: "/pide.jpg",
+			},
+		],
+		salata: [
+			{
+				_id: "demo-salata",
+				name: "Mevsim Salata",
+				price: 24.99,
+				image: "/salata.jpg",
+			},
+		],
+		wrap: [
+			{
+				_id: "demo-wrap",
+				name: "Tavuklu Wrap",
+				price: 34.99,
+				image: "/wrap.jpg",
+			},
+		],
 	};
 
 	const [products, setProducts] = useState(
