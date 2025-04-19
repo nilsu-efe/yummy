@@ -5,7 +5,6 @@ import { ShoppingCart } from "lucide-react";
 import CartItem from "../components/CartItem";
 import PeopleAlsoBought from "../components/PeopleAlsoBought";
 import OrderSummary from "../components/OrderSummary";
-import GiftCouponCard from "../components/GiftCouponCard";
 
 const CartPage = () => {
 	const { cart } = useCartStore();
