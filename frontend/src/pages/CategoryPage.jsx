@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 
 const CategoryPage = () => {
@@ -36,8 +36,15 @@ const CategoryPage = () => {
 		(defaultProducts[category] || []).map((p) => ({ ...p, isFavorite: false }))
 	);
 
+	// Favori listesini localStorage'a kaydet
+	const saveFavorites = (favorites) => {
+		localStorage.setItem("favorites", JSON.stringify(favorites));
+	};
+
 	const handleDelete = (id) => {
-		setProducts((prev) => prev.filter((p) => p._id !== id));
+		const updated = products.filter((p) => p._id !== id);
+		setProducts(updated);
+		saveFavorites(updated.filter((p) => p.isFavorite));
 	};
 
 	const handleAdd = () => {
@@ -48,15 +55,19 @@ const CategoryPage = () => {
 			image: `/${category}.jpg`,
 			isFavorite: false,
 		};
-		setProducts((prev) => [...prev, newProduct]);
+		const updated = [...products, newProduct];
+		setProducts(updated);
+		saveFavorites(updated.filter((p) => p.isFavorite));
 	};
 
 	const toggleFavorite = (id) => {
-		setProducts((prev) =>
-			prev.map((p) =>
-				p._id === id ? { ...p, isFavorite: !p.isFavorite } : p
-			)
+		const updated = products.map((p) =>
+			p._id === id ? { ...p, isFavorite: !p.isFavorite } : p
 		);
+		setProducts(updated);
+
+		const newFavorites = updated.filter((p) => p.isFavorite);
+		saveFavorites(newFavorites);
 	};
 
 	return (
@@ -80,16 +91,12 @@ const CategoryPage = () => {
 						{products.map((product) => (
 							<div key={product._id} className="relative">
 								<ProductCard product={product} />
-
-								{/* Sil Butonu */}
 								<button
 									onClick={() => handleDelete(product._id)}
 									className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1 text-sm rounded"
 								>
 									Sil
 								</button>
-
-								{/* Favori Butonu */}
 								<button
 									onClick={() => toggleFavorite(product._id)}
 									className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 text-sm rounded"
