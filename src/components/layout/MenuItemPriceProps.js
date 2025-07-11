@@ -15,13 +15,14 @@ export default function MenuItemPriceProps({name,addLabel,props,setProps}) {
   }
 
   function editProp(ev, index, prop) {
-    const newValue = ev.target.value;
-    setProps(prevSizes => {
-      const newSizes = [...prevSizes];
-      newSizes[index][prop] = newValue;
-      return newSizes;
-    });
-  }
+  const newValue = prop === "price" ? Number(ev.target.value) : ev.target.value;
+  setProps(prevSizes => {
+    const newSizes = [...prevSizes];
+    newSizes[index][prop] = newValue;
+    return newSizes;
+  });
+}
+
 
   function removeProp(indexToRemove) {
     setProps(prev => prev.filter((v,index) => index !== indexToRemove));

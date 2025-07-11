@@ -23,20 +23,25 @@ export const authOptions = {
         username: { label: "Email", type: "email", placeholder: "test@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
-        const email = credentials?.email;
-        const password = credentials?.password;
+     async authorize(credentials) {
+  const { email, password } = credentials;
 
-        mongoose.connect(process.env.MONGO_URL);
-        const user = await User.findOne({email});
-        const passwordOk = user && bcrypt.compareSync(password, user.password);
+  if (!email || !password) return null;
 
-        if (passwordOk) {
-          return user;
-        }
+  await mongoose.connect(process.env.MONGO_URL);
+  const user = await User.findOne({ email }).select("+password"); // eğer şifre select:false ise
 
-        return null
-      }
+  if (!user) return null;
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) return null;
+
+  return {
+    id: user._id.toString(),
+    email: user.email,
+    name: user.name, // opsiyonel
+  };
+}
     })
   ],
 };

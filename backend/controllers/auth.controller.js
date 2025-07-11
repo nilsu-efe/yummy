@@ -2,6 +2,7 @@ import { redis } from "../lib/redis.js";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 
+// Token oluşturma
 const generateTokens = (userId) => {
 	const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
 		expiresIn: "15m",
@@ -14,39 +15,40 @@ const generateTokens = (userId) => {
 	return { accessToken, refreshToken };
 };
 
+// Refresh token'ı Redis'e kaydet
 const storeRefreshToken = async (userId, refreshToken) => {
-	await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7 * 24 * 60 * 60); // 7days
+	await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7 * 24 * 60 * 60); // 7 gün
 };
 
+// Cookie ayarları
 const setCookies = (res, accessToken, refreshToken) => {
 	res.cookie("accessToken", accessToken, {
-		httpOnly: true, // prevent XSS attacks, cross site scripting attack
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict", // prevents CSRF attack, cross-site request forgery attack
-		maxAge: 15 * 60 * 1000, // 15 minutes
+		httpOnly: true,
+		secure: false, // HTTP için false
+		sameSite: "lax",
+		maxAge: 15 * 60 * 1000,
 	});
 	res.cookie("refreshToken", refreshToken, {
-		httpOnly: true, // prevent XSS attacks, cross site scripting attack
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict", // prevents CSRF attack, cross-site request forgery attack
-		maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+		httpOnly: true,
+		secure: false,
+		sameSite: "lax",
+		maxAge: 7 * 24 * 60 * 60 * 1000,
 	});
 };
 
+// Kayıt
 export const signup = async (req, res) => {
 	const { email, password, name } = req.body;
 	try {
 		const userExists = await User.findOne({ email });
-
 		if (userExists) {
 			return res.status(400).json({ message: "User already exists" });
 		}
+
 		const user = await User.create({ name, email, password });
 
-		// authenticate
 		const { accessToken, refreshToken } = generateTokens(user._id);
 		await storeRefreshToken(user._id, refreshToken);
-
 		setCookies(res, accessToken, refreshToken);
 
 		res.status(201).json({
@@ -61,6 +63,7 @@ export const signup = async (req, res) => {
 	}
 };
 
+// Giriş
 export const login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -86,6 +89,7 @@ export const login = async (req, res) => {
 	}
 };
 
+// Çıkış
 export const logout = async (req, res) => {
 	try {
 		const refreshToken = req.cookies.refreshToken;
@@ -103,11 +107,10 @@ export const logout = async (req, res) => {
 	}
 };
 
-// this will refresh the access token
+// Refresh token
 export const refreshToken = async (req, res) => {
 	try {
 		const refreshToken = req.cookies.refreshToken;
-
 		if (!refreshToken) {
 			return res.status(401).json({ message: "No refresh token provided" });
 		}
@@ -119,12 +122,16 @@ export const refreshToken = async (req, res) => {
 			return res.status(401).json({ message: "Invalid refresh token" });
 		}
 
-		const accessToken = jwt.sign({ userId: decoded.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+		const accessToken = jwt.sign(
+			{ userId: decoded.userId },
+			process.env.ACCESS_TOKEN_SECRET,
+			{ expiresIn: "15m" }
+		);
 
 		res.cookie("accessToken", accessToken, {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
+			secure: false,
+			sameSite: "lax",
 			maxAge: 15 * 60 * 1000,
 		});
 
@@ -135,6 +142,7 @@ export const refreshToken = async (req, res) => {
 	}
 };
 
+// Profil
 export const getProfile = async (req, res) => {
 	try {
 		res.json(req.user);
