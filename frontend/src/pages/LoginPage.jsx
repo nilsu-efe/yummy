@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { LogIn, Mail, Lock, ArrowRight, Loader } from "lucide-react";
+import { LogIn, Mail, Lock, ArrowRight, Loader, AlertCircle } from "lucide-react";
 import { useUserStore } from "../stores/useUserStore";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
-	const { login, loading } = useUserStore();
+	const { login, loading, error } = useUserStore();
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -34,6 +34,12 @@ const LoginPage = () => {
 				transition={{ duration: 0.8, delay: 0.2 }}
 			>
 				<div className='bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10'>
+					{error && (
+						<div className='mb-4 p-3 bg-red-900/50 border border-red-500 rounded-md flex items-center'>
+							<AlertCircle className='h-5 w-5 text-red-400 mr-2' />
+							<span className='text-red-300 text-sm'>{error}</span>
+						</div>
+					)}
 					<form onSubmit={handleSubmit} className='space-y-6'>
 						<div>
 							<label htmlFor='email' className='block text-sm font-medium text-gray-300'>

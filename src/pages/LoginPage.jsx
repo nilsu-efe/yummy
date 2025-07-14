@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUserStore } from "../stores/useUserStore";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading, error } = useUserStore();
+  const { login, loading, error, clearError } = useUserStore();
+
+  // Sayfa yüklendiğinde error'u temizle
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -19,17 +19,24 @@ import { useCartStore } from "./stores/useCartStore";
 import Profile from "./components/Profile";
 
 function App() {
-	const { user, checkAuth, checkingAuth } = useUserStore();
+	const { user, checkAuth, checkingAuth, hasCheckedAuth } = useUserStore();
 	const { getCartItems } = useCartStore();
 
 	useEffect(() => {
-		checkAuth();
-	}, [checkAuth]);
+		// Sadece bir kez auth kontrolü yap
+		if (!hasCheckedAuth) {
+			console.log("🔍 App.jsx - İlk auth kontrolü yapılıyor...");
+			checkAuth();
+		}
+	}, [checkAuth, hasCheckedAuth]);
 
 	useEffect(() => {
-		if (!user) return;
-		getCartItems();
-	}, [getCartItems, user]);
+		// Sadece kullanıcı giriş yaptığında ve auth kontrolü tamamlandığında sepeti yükle
+		if (user && hasCheckedAuth && !checkingAuth) {
+			console.log("🛒 Kullanıcı giriş yaptı, sepet yükleniyor...");
+			getCartItems();
+		}
+	}, [getCartItems, user, hasCheckedAuth, checkingAuth]);
 
 	if (checkingAuth) return <LoadingSpinner />;
 
@@ -60,7 +67,7 @@ function App() {
 					{/* ✅ Yeni eklenen hamburger sayfası route'u */}
 					<Route path='/hamburgers' element={<Hamburgers />} />
 					<Route path='/favorites' element={<Favorites />} />
-					<Route path="/profile" element={<Profile />} />
+					<Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
 				</Routes>
 			</div>
 

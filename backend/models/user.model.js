@@ -19,6 +19,44 @@ const userSchema = new mongoose.Schema(
 			required: [true, "Password is required"],
 			minlength: [6, "Password must be at least 6 characters long"],
 		},
+		// Yeni profil bilgileri
+		phone: {
+			type: String,
+			trim: true,
+		},
+		address: {
+			street: {
+				type: String,
+				trim: true,
+			},
+			city: {
+				type: String,
+				trim: true,
+			},
+			state: {
+				type: String,
+				trim: true,
+			},
+			country: {
+				type: String,
+				trim: true,
+				default: "Türkiye",
+			},
+			postalCode: {
+				type: String,
+				trim: true,
+			},
+		},
+		birthDate: {
+			type: Date,
+		},
+		gender: {
+			type: String,
+			enum: ["male", "female", "other"],
+		},
+		profileImage: {
+			type: String,
+		},
 		cartItems: [
 			{
 				quantity: {

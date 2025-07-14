@@ -68,7 +68,12 @@ const Navbar = () => {
 							<button
 								className='bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 
 								rounded-md flex items-center transition duration-300 ease-in-out'
-								onClick={logout}
+								onClick={async () => {
+									console.log("🔐 Logout butonu tıklandı");
+									console.log("👤 Mevcut user:", user);
+									await logout();
+									console.log("✅ Logout tamamlandı");
+								}}
 							>
 								<LogOut size={18} />
 								<span className='hidden sm:inline ml-2'>Log Out</span>

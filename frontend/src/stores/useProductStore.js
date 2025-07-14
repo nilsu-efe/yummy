@@ -15,8 +15,25 @@ export const useProductStore = create((set) => ({
 				products: [...prevState.products, res.data],
 				loading: false,
 			}));
+			toast.success("Ürün başarıyla oluşturuldu!");
 		} catch (error) {
-			toast.error(error.response.data.error);
+			toast.error(error.response?.data?.error || "Ürün oluşturulurken hata oluştu");
+			set({ loading: false });
+		}
+	},
+	updateProduct: async (productId, productData) => {
+		set({ loading: true });
+		try {
+			const res = await axios.put(`/products/${productId}`, productData);
+			set((prevState) => ({
+				products: prevState.products.map((product) =>
+					product._id === productId ? res.data : product
+				),
+				loading: false,
+			}));
+			toast.success("Ürün başarıyla güncellendi!");
+		} catch (error) {
+			toast.error(error.response?.data?.error || "Ürün güncellenirken hata oluştu");
 			set({ loading: false });
 		}
 	},
@@ -27,7 +44,7 @@ export const useProductStore = create((set) => ({
 			set({ products: response.data.products, loading: false });
 		} catch (error) {
 			set({ error: "Failed to fetch products", loading: false });
-			toast.error(error.response.data.error || "Failed to fetch products");
+			toast.error(error.response?.data?.error || "Ürünler yüklenirken hata oluştu");
 		}
 	},
 	fetchProductsByCategory: async (category) => {
@@ -37,7 +54,7 @@ export const useProductStore = create((set) => ({
 			set({ products: response.data.products, loading: false });
 		} catch (error) {
 			set({ error: "Failed to fetch products", loading: false });
-			toast.error(error.response.data.error || "Failed to fetch products");
+			toast.error(error.response?.data?.error || "Ürünler yüklenirken hata oluştu");
 		}
 	},
 	deleteProduct: async (productId) => {
@@ -48,9 +65,10 @@ export const useProductStore = create((set) => ({
 				products: prevProducts.products.filter((product) => product._id !== productId),
 				loading: false,
 			}));
+			toast.success("Ürün başarıyla silindi!");
 		} catch (error) {
 			set({ loading: false });
-			toast.error(error.response.data.error || "Failed to delete product");
+			toast.error(error.response?.data?.error || "Ürün silinirken hata oluştu");
 		}
 	},
 	toggleFeaturedProduct: async (productId) => {
@@ -64,9 +82,10 @@ export const useProductStore = create((set) => ({
 				),
 				loading: false,
 			}));
+			toast.success(response.data.isFeatured ? "Ürün öne çıkan olarak ayarlandı!" : "Ürün öne çıkan listesinden kaldırıldı!");
 		} catch (error) {
 			set({ loading: false });
-			toast.error(error.response.data.error || "Failed to update product");
+			toast.error(error.response?.data?.error || "Ürün güncellenirken hata oluştu");
 		}
 	},
 	fetchFeaturedProducts: async () => {

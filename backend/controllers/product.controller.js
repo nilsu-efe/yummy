@@ -5,10 +5,10 @@ import Category from "../models/category.model.js";  // Category modelini ekledi
 
 export const getAllProducts = async (req, res) => {
 	try {
-		const products = await Product.find({}); // find all products
+		const products = await Product.find({}).populate('category');
 		res.json({ products });
 	} catch (error) {
-		console.log("Error in getAllProducts controller", error.message);
+		console.log("❌ Error in getAllProducts controller", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
@@ -39,23 +39,92 @@ export const createProduct = async (req, res) => {
 	try {
 		const { name, description, price, image, category } = req.body;
 
-		let cloudinaryResponse = null;
-
-		if (image) {
-			cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+		// Cloudinary yapılandırması varsa kullan, yoksa direkt image URL'ini kullan
+		let imageUrl = image || "";
+		
+		if (image && process.env.CLOUDINARY_API_KEY) {
+			try {
+				const cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+				imageUrl = cloudinaryResponse?.secure_url || image;
+			} catch (cloudinaryError) {
+				console.log("Cloudinary hatası:", cloudinaryError.message);
+				// Cloudinary hatası durumunda direkt image URL'ini kullan
+				imageUrl = image;
+			}
 		}
 
 		const product = await Product.create({
 			name,
 			description,
 			price,
-			image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
+			image: imageUrl,
 			category,
 		});
 
 		res.status(201).json(product);
 	} catch (error) {
 		console.log("Error in createProduct controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
+export const updateProduct = async (req, res) => {
+	try {
+		const { name, description, price, image, category } = req.body;
+		const productId = req.params.id;
+
+		const product = await Product.findById(productId);
+		if (!product) {
+			return res.status(404).json({ message: "Product not found" });
+		}
+
+		let newImageUrl = product.image; // Mevcut resmi koru
+
+		// Eğer yeni resim yüklendiyse
+		if (image && image !== product.image) {
+			// Cloudinary yapılandırması varsa kullan
+			if (process.env.CLOUDINARY_API_KEY) {
+				// Eski resmi Cloudinary'den sil
+				if (product.image && product.image.includes('cloudinary')) {
+					const publicId = product.image.split("/").pop().split(".")[0];
+					try {
+						await cloudinary.uploader.destroy(`products/${publicId}`);
+						console.log("Eski resim Cloudinary'den silindi");
+					} catch (error) {
+						console.log("Eski resim silinirken hata:", error);
+					}
+				}
+
+				// Yeni resmi yükle
+				try {
+					const cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+					newImageUrl = cloudinaryResponse?.secure_url || image;
+				} catch (cloudinaryError) {
+					console.log("Cloudinary hatası:", cloudinaryError.message);
+					newImageUrl = image;
+				}
+			} else {
+				// Cloudinary yoksa direkt image URL'ini kullan
+				newImageUrl = image;
+			}
+		}
+
+		// Ürünü güncelle
+		const updatedProduct = await Product.findByIdAndUpdate(
+			productId,
+			{
+				name,
+				description,
+				price,
+				image: newImageUrl,
+				category,
+			},
+			{ new: true }
+		);
+
+		res.json(updatedProduct);
+	} catch (error) {
+		console.log("Error in updateProduct controller", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
@@ -68,13 +137,14 @@ export const deleteProduct = async (req, res) => {
 			return res.status(404).json({ message: "Product not found" });
 		}
 
-		if (product.image) {
+		// Cloudinary yapılandırması varsa ve resim Cloudinary'de ise sil
+		if (product.image && process.env.CLOUDINARY_API_KEY && product.image.includes('cloudinary')) {
 			const publicId = product.image.split("/").pop().split(".")[0];
 			try {
 				await cloudinary.uploader.destroy(`products/${publicId}`);
-				console.log("deleted image from cloduinary");
+				console.log("deleted image from cloudinary");
 			} catch (error) {
-				console.log("error deleting image from cloduinary", error);
+				console.log("error deleting image from cloudinary", error);
 			}
 		}
 

@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import SignUpPage from "./pages/SignUpPage";
@@ -20,15 +20,26 @@ import PurchaseCancelPage from "./pages/PurchaseCancelPage";
 function App() {
   const { user, checkAuth, checkingAuth } = useUserStore();
   const { getCartItems } = useCartStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    // Sadece sayfa yüklendiğinde bir kez checkAuth çağır
+    if (checkingAuth) {
+      checkAuth();
+    }
+  }, []); // checkAuth dependency'sini kaldırdık
 
   useEffect(() => {
     if (!user) return;
     getCartItems();
   }, [getCartItems, user]);
+
+  // Logout sonrası ana sayfaya yönlendir
+  useEffect(() => {
+    if (!user && !checkingAuth) {
+      navigate("/");
+    }
+  }, [user, checkingAuth, navigate]);
 
   if (checkingAuth) return <LoadingSpinner />;
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { UserPlus, Mail, Lock, User, ArrowRight, Loader } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,7 +12,12 @@ const SignUpPage = () => {
 		confirmPassword: "",
 	});
 
-	const { signup, loading } = useUserStore();
+	const { signup, loading, error, clearError } = useUserStore();
+
+	// Sayfa yüklendiğinde error'u temizle
+	useEffect(() => {
+		clearError();
+	}, [clearError]);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -37,6 +42,11 @@ const SignUpPage = () => {
 				transition={{ duration: 0.8, delay: 0.2 }}
 			>
 				<div className='bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10'>
+					{error && (
+						<div className='mb-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-md'>
+							<p className='text-red-400 text-sm'>{error}</p>
+						</div>
+					)}
 					<form onSubmit={handleSubmit} className='space-y-6'>
 						<div>
 							<label htmlFor='name' className='block text-sm font-medium text-gray-300'>

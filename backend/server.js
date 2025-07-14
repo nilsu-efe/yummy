@@ -32,9 +32,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ CORS ayarı (frontend portuna dikkat et)
+// ✅ CORS ayarı (tüm frontend portlarını kabul et)
 app.use(cors({
-  origin: "http://localhost:5173", // Vite (frontend) adresi
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174", 
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://localhost:5177",
+    "http://localhost:5178"
+  ],
   credentials: true
 }));
 

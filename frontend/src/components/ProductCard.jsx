@@ -7,90 +7,55 @@ import { useFavoriteStore } from "../stores/useFavoriteStore";
 const ProductCard = ({ product }) => {
 	const { user } = useUserStore();
 	const { addToCart } = useCartStore();
-	const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+	const { favorites, addFavorite, removeFavorite, isFavorite } = useFavoriteStore();
 
-	const isFavorited = favorites.some((p) => p._id === product._id);
+	const isFavorited = isFavorite(product._id);
+
+	// Resim URL'sini kontrol et ve fallback ekle
+	const imageUrl = product.image || "https://via.placeholder.com/300x200?text=Resim+Yok";
+
+	const handleImageError = (e) => {
+		e.target.src = "https://via.placeholder.com/300x200?text=Resim+Yok";
+	};
 
 	const handleAddToCart = () => {
 		if (!user) {
-			toast.error("Lütfen sepete ürün eklemek için giriş yapın", { id: "login" });
-			return;
-		} else {
-			addToCart(product);
-			toast.success("Ürün sepete eklendi");
-		}
-	};
-
-	// Backend'e favori ekle/çıkar isteği atan fonksiyon
-	const toggleFavoriteInDB = async () => {
-		if (!user) {
-			toast.error("Lütfen giriş yapın");
+			toast.error("Sepete eklemek için giriş yapmalısınız");
 			return;
 		}
-
-		try {
-			const res = await fetch("/api/auth/favorites/toggle", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${user.token}`, // token'ın doğru şekilde burada olması lazım
-				},
-				body: JSON.stringify({ productId: product._id }),
-			});
-
-			const data = await res.json();
-
-			if (!res.ok) {
-				throw new Error(data.message || "Favori işlemi başarısız");
-			}
-
-			// Local store'u backend'e göre güncelle
-			if (data.favorites.includes(product._id)) {
-				addFavorite(product);
-				toast.success("Favorilere eklendi");
-			} else {
-				removeFavorite(product._id);
-				toast.success("Favorilerden çıkarıldı");
-			}
-		} catch (err) {
-			toast.error(err.message);
-		}
+		addToCart(product);
 	};
 
 	return (
-		<div className='flex w-full relative flex-col overflow-hidden rounded-lg border border-gray-700 shadow-lg'>
-			<div className='relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl'>
-				<img className='object-cover w-full' src={product.image} alt={product.name} />
-				<div className='absolute inset-0 bg-black bg-opacity-20' />
-
-				{/* Favori butonu */}
+		<div className="bg-gray-800/50 backdrop-blur-sm rounded-lg shadow-md p-4 flex flex-col justify-between h-full hover:shadow-lg transition-shadow border border-gray-700/50">
+			<div className="relative flex-1 flex items-center justify-center">
+				<img
+					src={imageUrl}
+					alt={product.name}
+					className="w-full h-40 object-cover rounded-md"
+					onError={handleImageError}
+				/>
 				<button
-					className='absolute top-2 right-2 p-1 bg-white rounded-full text-red-500'
-					onClick={toggleFavoriteInDB} // buraya fonksiyonu bağladık
+					className={`absolute top-2 right-2 text-red-500 bg-white rounded-full p-1 shadow hover:scale-110 transition-transform ${isFavorited ? "" : "opacity-50"}`}
+					onClick={() =>
+						isFavorited ? removeFavorite(product._id) : addFavorite(product._id)
+					}
 				>
-					<Heart
-						size={20}
-						fill={isFavorited ? "red" : "none"}
-						stroke={isFavorited ? "red" : "currentColor"}
-					/>
+					<Heart fill={isFavorited ? "#ef4444" : "none"} />
 				</button>
 			</div>
-
-			<div className='mt-4 px-5 pb-5'>
-				<h5 className='text-xl font-semibold tracking-tight text-white'>{product.name}</h5>
-				<div className='mt-2 mb-5 flex items-center justify-between'>
-					<p>
-						<span className='text-3xl font-bold text-emerald-400'>{product.price}₺</span>
-					</p>
+			<div className="mt-4 flex flex-col flex-1">
+				<h3 className="text-lg font-semibold mb-2 text-white">{product.name}</h3>
+				<p className="text-gray-300 flex-1 text-sm">{product.description}</p>
+				<div className="flex items-center justify-between mt-4">
+					<span className="text-green-600 font-bold text-lg">₺{product.price}</span>
+					<button
+						className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center transition-colors"
+						onClick={handleAddToCart}
+					>
+						<ShoppingCart className="mr-2" size={18} /> Sepete Ekle
+					</button>
 				</div>
-				<button
-					className='flex items-center justify-center rounded-lg bg-emerald-600 px-5 py-2.5 text-center text-sm font-medium
-					 text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300'
-					onClick={handleAddToCart}
-				>
-					<ShoppingCart size={22} className='mr-2' />
-					Sepete Ekle
-				</button>
 			</div>
 		</div>
 	);
