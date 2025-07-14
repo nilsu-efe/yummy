@@ -1,33 +1,37 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-const HamburgerList = () => {
-	const [products, setProducts] = useState([]);
+const Hamburger = () => {
+  const [products, setProducts] = useState([]);
 
-	useEffect(() => {
-		const fetchHamburgers = async () => {
-			const res = await fetch("/api/products/hamburger");
-			const data = await res.json();
-			setProducts(data.products);
-		};
+  useEffect(() => {
+    const fetchHamburgers = async () => {
+      try {
+        const res = await fetch("/api/products/hamburger");
+        const data = await res.json();
+        setProducts(data.products);
+      } catch (err) {
+        console.error("Ürünler alınamadı:", err);
+      }
+    };
 
-		fetchHamburgers();
-	}, []);
+    fetchHamburgers();
+  }, []);
 
-	return (
-		<div>
-			<h2>Hamburger Ürünleri</h2>
-			<div className="grid grid-cols-2 gap-4">
-				{products.map((product) => (
-					<div key={product._id} className="p-4 border rounded">
-						<img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
-						<h3 className="text-xl font-bold">{product.name}</h3>
-						<p>{product.description}</p>
-						<p className="text-green-600 font-semibold">{product.price} TL</p>
-					</div>
-				))}
-			</div>
-		</div>
-	);
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Hamburger Çeşitleri</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {products.map((p) => (
+          <div key={p._id} className="border p-4 rounded bg-white text-black">
+            <img src={p.image} alt={p.name} className="w-full h-40 object-cover mb-2" />
+            <h3 className="text-lg font-semibold">{p.name}</h3>
+            <p>{p.description}</p>
+            <p className="text-green-600 font-bold mt-2">{p.price}₺</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default HamburgerList;
+export default Hamburger;

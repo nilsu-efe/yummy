@@ -15,6 +15,9 @@ import couponRoutes from "./routes/coupon.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import analyticsRoutes from "./routes/analytics.route.js";
 
+// 👇 Yeni users route importu
+import usersRoutes from "./routes/users.route.js";
+
 import { connectDB } from "./lib/db.js";
 
 // ✅ ENV değişkenlerini kontrol et (debug için)
@@ -46,6 +49,9 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/analytics", analyticsRoutes);
+
+// 👇 Yeni kullanıcı rotasını ekle
+app.use("/api/users", usersRoutes);
 
 // ✅ Production ortamında frontend build dosyalarını serve et
 if (process.env.NODE_ENV === "production") {

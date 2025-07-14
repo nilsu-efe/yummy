@@ -111,22 +111,27 @@ export const getRecommendedProducts = async (req, res) => {
 
 export const getProductsByCategory = async (req, res) => {
 	try {
+		// Önce tanımla
 		const categoryName = req.params.category;
+		console.log("Gelen kategori adı:", categoryName);
 
-		// Kategori adından önce kategori objesini bul
 		const category = await Category.findOne({ name: categoryName });
+		console.log("Bulunan kategori:", category);
+
 		if (!category) {
 			return res.status(404).json({ message: "Category not found" });
 		}
 
-		// Kategori id'sine göre ürünleri getir
 		const products = await Product.find({ category: category._id }).populate("category");
+		console.log("Ürünler:", products);
+
 		res.json({ products });
 	} catch (error) {
 		console.error("Error in getProductsByCategory:", error.message);
 		res.status(500).json({ message: "Server Error" });
 	}
 };
+
 
 export const toggleFeaturedProduct = async (req, res) => {
 	try {

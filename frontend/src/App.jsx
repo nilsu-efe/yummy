@@ -9,13 +9,14 @@ import CartPage from "./pages/CartPage";
 import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
 import PurchaseCancelPage from "./pages/PurchaseCancelPage";
 import Hamburgers from "./components/HamburgerList"; // ✅ Yeni eklenen sayfa
-
+import Favorites from "./pages/Favorites";
 import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { useUserStore } from "./stores/useUserStore";
 import { useEffect } from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { useCartStore } from "./stores/useCartStore";
+import Profile from "./components/Profile";
 
 function App() {
 	const { user, checkAuth, checkingAuth } = useUserStore();
@@ -58,6 +59,8 @@ function App() {
 
 					{/* ✅ Yeni eklenen hamburger sayfası route'u */}
 					<Route path='/hamburgers' element={<Hamburgers />} />
+					<Route path='/favorites' element={<Favorites />} />
+					<Route path="/profile" element={<Profile />} />
 				</Routes>
 			</div>
 

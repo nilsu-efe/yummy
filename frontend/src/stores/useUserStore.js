@@ -1,108 +1,114 @@
 import { create } from "zustand";
-import axios from "../lib/axios";
-import { toast } from "react-hot-toast";
 
-export const useUserStore = create((set, get) => ({
-	user: null,
-	loading: false,
-	checkingAuth: true,
+export const useUserStore = create((set) => ({
+  user: null,
+  loading: false,
+  error: null,
+  checkingAuth: true, // Başlangıçta auth kontrolü var
 
-	signup: async ({ name, email, password, confirmPassword }) => {
-		set({ loading: true });
+  login: async (email, password) => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: "include", // cookie gönderimi için önemli
+      });
 
-		if (password !== confirmPassword) {
-			set({ loading: false });
-			return toast.error("Passwords do not match");
-		}
+      if (!res.ok) {
+        const errorData = await res.json();
+        set({ error: errorData.message || "Login başarısız", loading: false });
+        return;
+      }
 
-		try {
-			const res = await axios.post("/auth/signup", { name, email, password });
-			set({ user: res.data, loading: false });
-		} catch (error) {
-			set({ loading: false });
-			toast.error(error.response.data.message || "An error occurred");
-		}
-	},
-	login: async (email, password) => {
-		set({ loading: true });
+      const data = await res.json();
+      set({ user: data.user, loading: false }); // user objesini ayıklıyoruz
+    } catch (error) {
+      set({ error: error.message || "Sunucu hatası", loading: false });
+    }
+  },
 
-		try {
-			const res = await axios.post("/auth/login", { email, password });
+  logout: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
 
-			set({ user: res.data, loading: false });
-		} catch (error) {
-			set({ loading: false });
-			toast.error(error.response.data.message || "An error occurred");
-		}
-	},
+      if (!res.ok) {
+        const errorData = await res.json();
+        set({ error: errorData.message || "Logout başarısız", loading: false });
+        return;
+      }
 
-	logout: async () => {
-		try {
-			await axios.post("/auth/logout");
-			set({ user: null });
-		} catch (error) {
-			toast.error(error.response?.data?.message || "An error occurred during logout");
-		}
-	},
+      set({ user: null, loading: false });
+    } catch (error) {
+      set({ error: error.message || "Sunucu hatası", loading: false });
+    }
+  },
 
-	checkAuth: async () => {
-		set({ checkingAuth: true });
-		try {
-			const response = await axios.get("/auth/profile");
-			set({ user: response.data, checkingAuth: false });
-		} catch (error) {
-			console.log(error.message);
-			set({ checkingAuth: false, user: null });
-		}
-	},
+  fetchProfile: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("http://localhost:5001/api/users/profile", {
+        method: "GET",
+        credentials: "include",
+      });
 
-	refreshToken: async () => {
-		// Prevent multiple simultaneous refresh attempts
-		if (get().checkingAuth) return;
+      if (!res.ok) {
+        const errorData = await res.json();
+        set({ error: errorData.message || "Profil alınamadı", loading: false });
+        return;
+      }
 
-		set({ checkingAuth: true });
-		try {
-			const response = await axios.post("/auth/refresh-token");
-			set({ checkingAuth: false });
-			return response.data;
-		} catch (error) {
-			set({ user: null, checkingAuth: false });
-			throw error;
-		}
-	},
+      const data = await res.json();
+      set({ user: data.user, loading: false });
+    } catch (error) {
+      set({ error: error.message || "Sunucu hatası", loading: false });
+    }
+  },
+
+  refreshToken: async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/refresh-token", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        set({ error: errorData.message || "Token yenilenemedi" });
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      set({ error: error.message || "Sunucu hatası" });
+      return false;
+    }
+  },
+
+  checkAuth: async () => {
+    set({ checkingAuth: true });
+    try {
+      const res = await fetch("http://localhost:5001/api/users/profile", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        set({ user: null, checkingAuth: false });
+        return;
+      }
+
+      const data = await res.json();
+      set({ user: data.user, checkingAuth: false });
+    } catch (error) {
+      set({ user: null, checkingAuth: false });
+    }
+  },
 }));
-
-// TODO: Implement the axios interceptors for refreshing access token
-
-// Axios interceptor for token refresh
-let refreshPromise = null;
-
-axios.interceptors.response.use(
-	(response) => response,
-	async (error) => {
-		const originalRequest = error.config;
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			originalRequest._retry = true;
-
-			try {
-				// If a refresh is already in progress, wait for it to complete
-				if (refreshPromise) {
-					await refreshPromise;
-					return axios(originalRequest);
-				}
-
-				// Start a new refresh process
-				refreshPromise = useUserStore.getState().refreshToken();
-				await refreshPromise;
-				refreshPromise = null;
-
-				return axios(originalRequest);
-			} catch (refreshError) {
-				// If refresh fails, redirect to login or handle as needed
-				useUserStore.getState().logout();
-				return Promise.reject(refreshError);
-			}
-		}
-		return Promise.reject(error);
-	}
-);

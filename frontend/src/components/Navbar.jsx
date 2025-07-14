@@ -1,4 +1,4 @@
-import { ShoppingCart, UserPlus, LogIn, LogOut, Lock } from "lucide-react";
+import { ShoppingCart, UserPlus, LogIn, LogOut, Lock, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
@@ -19,16 +19,23 @@ const Navbar = () => {
 					<nav className='flex flex-wrap items-center gap-4'>
 						<Link
 							to={"/"}
-							className='text-gray-300 hover:text-emerald-400 transition duration-300
-					 ease-in-out'
+							className='text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out'
 						>
 							Home
 						</Link>
+
+						<Link
+							to={"/favorites"}
+							className='text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out flex items-center'
+						>
+							<Heart className='mr-1' size={20} />
+							<span className='hidden sm:inline'>Favoriler</span>
+						</Link>
+
 						{user && (
 							<Link
 								to={"/cart"}
-								className='relative group text-gray-300 hover:text-emerald-400 transition duration-300 
-							ease-in-out'
+								className='relative group text-gray-300 hover:text-emerald-400 transition duration-300 ease-in-out'
 							>
 								<ShoppingCart className='inline-block mr-1 group-hover:text-emerald-400' size={20} />
 								<span className='hidden sm:inline'>Cart</span>
@@ -42,21 +49,23 @@ const Navbar = () => {
 								)}
 							</Link>
 						)}
-						{isAdmin && (
-							<Link
-								className='bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-md font-medium
-								 transition duration-300 ease-in-out flex items-center'
-								to={"/secret-dashboard"}
-							>
-								<Lock className='inline-block mr-1' size={18} />
-								<span className='hidden sm:inline'>Dashboard</span>
-							</Link>
+
+						{user && !isAdmin && (
+  							<Link
+   								to="/dashboard"
+    							className="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1 rounded-md font-medium
+    							transition duration-300 ease-in-out flex items-center"
+ 							 >
+    						<UserPlus className="inline-block mr-1" size={18} />
+    						<span className="hidden sm:inline">Profil</span>
+  							</Link>
 						)}
+
 
 						{user ? (
 							<button
 								className='bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 
-						rounded-md flex items-center transition duration-300 ease-in-out'
+								rounded-md flex items-center transition duration-300 ease-in-out'
 								onClick={logout}
 							>
 								<LogOut size={18} />
@@ -88,4 +97,5 @@ const Navbar = () => {
 		</header>
 	);
 };
+
 export default Navbar;
