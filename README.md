@@ -5,3 +5,4 @@ Yummy; hızlı sipariş, güvenli ödeme ve müşteri memnuniyeti odaklı satı�
 
 1)Gereksinimler:https://github.com/nilsu-efe/yummy/blob/main/gereksinimlerim.md
 2)Durum diyagramı:https://github.com/nilsu-efe/yummy/blob/main/durum-diyagramı.jpeg
+3)Veritabanı diyagramı:https://github.com/nilsu-efe/yummy/blob/main/veritabani_diagrami.png
