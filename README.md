@@ -4,4 +4,4 @@ Yummy isimli restoran temalı e-ticaret sitemiz, online yemek siparişi deneyimi
 Yummy; hızlı sipariş, güvenli ödeme ve müşteri memnuniyeti odaklı satış sonrası hizmetleriyle restoran işletmeleri için dijital dönüşüm fırsatı sunmaktadır. Modern bir yazılım altyapısı ile geliştirilen bu platform, mobil uyumluluk ve yönetim kolaylığı gibi avantajlarıyla öne çıkmaktadır.
 
 1)Gereksinimler:https://github.com/nilsu-efe/yummy/blob/main/gereksinimlerim.md
-
+2)Durum diyagramı:https://github.com/nilsu-efe/yummy/blob/main/durum-diyagramı.jpeg
